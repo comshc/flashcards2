@@ -70,31 +70,39 @@ class Pane extends UIElement {
 class MenuBar extends Pane {
     constructor() {
         super(null, false);
-     
-        this.items = [];
 
-        this.list = document.createElement(ul);
-        this.content.appendChild(list);
+        for (let i = 0; i < arguments.length; i++) {
+            this.add(arguments[i]);
+        }
     }
 
-    #render() {
-        this.list.innerHTML = "";
+    add(item) {
+        item.attach(this.content);
+    }
+}
 
-        let par = this.content.parentElement
-        this.content = document.createElement("ul");
-        this.content.className = "menubar-items";
-        this.items.forEach((p) => {
-            let preview = document.createElement("li");
-            preview.className = "menubar-item";
-            preview.innerText = p.title;
-            this.content.appendChild(preview)
+class MenuItem extends UIElement {
+    constructor(name, color, concealed) {
+        super();
+        this.name = name;
+        this.color = color;
+        this.concealed = concealed;
+
+        this.content = document.createElement("button");
+        this.content.classList.add("menu-item");
+        this.content.style.backgroundColor = this.color;
+        this.content.style.outlineColor = this.color;
+
+        let title = document.createElement("span");
+        title.className = "menu-item-title";
+        title.innerText = this.name;
+
+
+        this.content.appendChild(title);
+       
+        this.content.addEventListener("click", () => {
+            add_pane(this.concealed);
         })
-    }
-
-    add(pane) {
-        this.items.push(pane);
-
-        this.#render();
     }
 }
 
@@ -111,10 +119,18 @@ a = new Split(Split.VERT);
 b = new Split(Split.HORZ);
 c = new Split(Split.HORZ);
 
-m = new MenuBar();
+m = new MenuBar(
+    new MenuItem("Test 1", "#8ec07c", new Pane("Test 1")),
+    new MenuItem("Verylongname", "#fabd2f", new Pane("Verylongname")),
+    new MenuItem("Test 3", "#d3869b", new Pane("Test 3"))
+);
+
 p1 = new Pane("Pane 1")
 p2 = new Pane("Pane 2")
 
+function add_pane(pane) {
+    c.has(pane);
+}
 
 a.has(
     b.setid("menubar-split").has(m),
